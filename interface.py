@@ -8,6 +8,17 @@ import matplotlib.pyplot as plt
 import io
 from constante import *
 
+def afficher_fenetre(fenetre, scene):
+    """Agrandit toute la scène sans déformer ses proportions."""
+    largeur, hauteur = fenetre.get_size()
+    facteur = min(largeur / scene.get_width(), hauteur / scene.get_height())
+    taille = (max(1, round(scene.get_width() * facteur)),
+              max(1, round(scene.get_height() * facteur)))
+    position = ((largeur - taille[0]) // 2, (hauteur - taille[1]) // 2)
+    fenetre.fill(Noir)
+    pygame.transform.smoothscale(scene, taille, fenetre.subsurface((*position, *taille)))
+    pygame.display.flip()
+
 def afficher_entites(screen,Liste_entite,assets):
     for entite in Liste_entite:
         entite.dessiner(screen,assets)

@@ -7,7 +7,9 @@ from Enregistreur import Enregistreur
 
 
 pygame.init()
-screen = pygame.display.set_mode((Largeur,Hauteur))
+fenetre = pygame.display.set_mode((Largeur,Hauteur), pygame.RESIZABLE)
+# La scène et la vidéo gardent une résolution fixe ; seul l'affichage est agrandi.
+screen = pygame.Surface((Largeur,Hauteur)).convert()
 pygame.display.set_caption('SIM Guerre PFC')
 assets= charger_assets()
 clock = pygame.time.Clock()
@@ -49,9 +51,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.VIDEORESIZE:
+            fenetre = pygame.display.set_mode(
+                (max(1, event.w), max(1, event.h)), pygame.RESIZABLE)
 
     clock.tick(FPS)
-    pygame.display.flip()
 
 
 
@@ -93,6 +97,7 @@ while running:
 
         enregistreur.ajouter_image(screen)
 
+    afficher_fenetre(fenetre, screen)
 
 
 if not  ajout_enregistreur:
