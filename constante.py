@@ -3,7 +3,7 @@ import pygame.draw
 
 # Terrain
 
-Hauteur_zone=540
+Hauteur_zone=1680
 
 def rectangle(largeur_rect, hauteur_rect, screen,x,y):
  pygame.draw.rect(screen,(0,0,0),(x, y, largeur_rect,hauteur_rect),1)
@@ -11,15 +11,15 @@ def rectangle(largeur_rect, hauteur_rect, screen,x,y):
 
 # Zone stat
 
-Hauteur_stat =120
+Hauteur_stat =240
 
 # Fentre
 
 Hauteur= Hauteur_zone +  Hauteur_stat
-Largeur= 500
+Largeur= 1080
 Marge = 10
 
-FPS=60
+FPS=24
 
 # Couleur
 
@@ -37,7 +37,7 @@ Noir=(0,0,0)
 
 rayon=10
 
-rayon_apparition=80
+rayon_apparition=500
 espace_min_spwan=10
 
 

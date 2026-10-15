@@ -1,38 +1,50 @@
 from interface import*
 from simulation import*
 
+import sys
+sys.path.append(r"C:\Users\bapti\Code en python\Enregisteur video")
+from Enregistreur import Enregistreur
+
 
 pygame.init()
 screen = pygame.display.set_mode((Largeur,Hauteur))
 pygame.display.set_caption('SIM Guerre PFC')
 assets= charger_assets()
-
-
-
 clock = pygame.time.Clock()
 police=pygame.font.SysFont("Arial", Taille_texte)
 police2=pygame.font.SysFont("Arial", taille_crown)
-
 zones = gerer_apparition()
-Liste_entite = []
-Liste_position = []
-Histo_pierre=[]
-Histo_ciseau=[]
-Histo_feuille=[]
+def init():
+    Liste_entite = []
+    Liste_position = []
+    Histo_pierre = []
+    Histo_ciseau = []
+    Histo_feuille = []
+    enregistreur = Enregistreur(Hauteur=Hauteur, Largeur=Largeur, FPS=FPS, chemin="test_video.mp4", duree_min=10)
+    win = False
+    creer_graph = False
+    surface_graph = None
+    ajout_enregistreur = False
 
-for espece in zones:
-    x_zone, y_zone = zones[espece]
-    for _ in range(15):
-        x, y = position_dans_zones(x_zone, y_zone,Liste_position)
-        Liste_entite.append(Entite(espece,x,y,7,random.uniform(0, 2*math.pi)))
-        Liste_position.append((x,y))
+    for espece in zones:
+        x_zone, y_zone = zones[espece]
+        for _ in range(30):
+            x, y = position_dans_zones(x_zone, y_zone, Liste_position)
+            Liste_entite.append(Entite(espece, x, y, 15, random.uniform(0, 2 * math.pi)))
+            Liste_position.append((x, y))
+
+    return Liste_entite, enregistreur, creer_graph,surface_graph,ajout_enregistreur,Histo_pierre,Histo_ciseau,Histo_feuille, win
+
+
+
+Liste_entite, enregistreur, creer_graph,surface_graph,ajout_enregistreur,Histo_pierre,Histo_ciseau,Histo_feuille,win =init()
+
 
 running = True
-win = False
-creer_graph=False
-surface_graph=None
+
 
 while running:
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -41,16 +53,24 @@ while running:
     clock.tick(FPS)
     pygame.display.flip()
 
+
+
     if win:
        screen.fill(Blanc)
        afficher_victoire(screen,win,assets,police2)
-
        if not creer_graph:
-           buffer_graph=creer_graphique(Histo_feuille, Histo_pierre, Histo_ciseau)
+           buffer_graph = creer_graphique(Histo_feuille, Histo_ciseau, Histo_pierre)
            surface = pygame.image.load(buffer_graph)
-           creer_graph=True
+           creer_graph = True
+       screen.blit(surface,(15,75))
 
-       screen.blit(surface,(25,300))
+       if not ajout_enregistreur:
+           enregistreur.ajouter_image(screen)
+           enregistreur.pause(10)
+           assez_long=enregistreur.exporter()
+           ajout_enregistreur = True
+           if not assez_long :
+               Liste_entite, enregistreur, creer_graph,surface_graph,ajout_enregistreur,Histo_pierre,Histo_ciseau,Histo_feuille,win =init()
 
 
     else:
@@ -63,9 +83,7 @@ while running:
 
         nb_ciseau, nb_feuille, nb_pierre=gerer_stat(Liste_entite,Histo_pierre,Histo_ciseau,Histo_feuille)
 
-
         win=condition_victoire(nb_ciseau, nb_feuille, nb_pierre)
-
 
         afficher_stat(screen,police2,nb_pierre,nb_feuille,nb_ciseau,assets)
 
@@ -73,9 +91,13 @@ while running:
 
         afficher_entites(screen,Liste_entite,assets)
 
+        enregistreur.ajouter_image(screen)
 
 
 
+if not  ajout_enregistreur:
+    enregistreur.writer.close()
+    os.remove(enregistreur.chemin)
 
 pygame.quit()
 

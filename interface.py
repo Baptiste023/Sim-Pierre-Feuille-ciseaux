@@ -1,5 +1,8 @@
 import os
 import matplotlib
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
@@ -53,7 +56,7 @@ def charger_assets():
 def afficher_victoire(screen,espece_gagnante, assets,police):
 
     x = (Largeur- taille_crown)/2
-    y = 75
+    y = 25
     x_2_point= x+ taille_crown+ 15
 
     nouvelle_dimention=pygame.transform.scale(assets[espece_gagnante],(taille_crown,taille_crown))
@@ -65,13 +68,50 @@ def afficher_victoire(screen,espece_gagnante, assets,police):
 
 def creer_graphique(Histo_feuille,Histo_ciseau,Histo_pierre):
 
+    couleur_feuille =  conversion(dico_couleur_entite["Feuille"])
+    couleur_pierre = conversion(dico_couleur_entite["Pierre"])
+    couleur_ciseau = conversion(dico_couleur_entite["Ciseau"])
+
+    curent_dir = os.path.dirname(os.path.abspath(__file__))
+    asset_dir = os.path.join(curent_dir, "assets")
+
     plt.figure(figsize = (5,4))
-    plt.plot(Histo_feuille,color="red")
-    plt.plot(Histo_ciseau,color="blue")
-    plt.plot(Histo_pierre,color="green")
+
+
+
+    image_pierre= plt.imread(os.path.join((asset_dir),"001-stone.png"))
+    icone_pierre=OffsetImage(image_pierre,zoom=0.05)
+    affichage_pierre=AnnotationBbox(icone_pierre,(0.52,0.90),xycoords='axes fraction')
+    plt.gca().add_artist(affichage_pierre)
+    image_ciseau = plt.imread(os.path.join((asset_dir), "008-scissors-1.png"))
+    icone_ciseau = OffsetImage(image_ciseau, zoom=0.05)
+    affichage_ciseau = AnnotationBbox(icone_ciseau,(0.32,0.90),xycoords='axes fraction')
+    plt.gca().add_artist(affichage_ciseau)
+
+    image_feuille = plt.imread(os.path.join((asset_dir), "001-paper-scroll.png"))
+    icone_feuille = OffsetImage(image_feuille, zoom=0.05)
+    affichage_feuille = AnnotationBbox(icone_feuille, (0.1,0.90),xycoords='axes fraction')
+    plt.gca().add_artist(affichage_feuille)
+
+    plt.plot(Histo_feuille, color=couleur_feuille,label="Feuille")
+    plt.plot(Histo_ciseau,color=couleur_ciseau,label="Ciseau")
+    plt.plot(Histo_pierre,color=couleur_pierre,label="Pierre")
+
+    ax = plt.gca()
+    ax.plot([0.2,0.25],[0.88,0.88],color=couleur_feuille,transform=ax.transAxes)
+    ax.plot([0.40, 0.45], [0.88, 0.88], color=couleur_ciseau, transform=ax.transAxes)
+    ax.plot([0.60, 0.65], [0.88, 0.88], color=couleur_pierre, transform=ax.transAxes)
+
     buffer=io.BytesIO()
     plt.savefig(buffer,format="png")
     buffer.seek(0)
-    plt.clf()
+    plt.close()
+
     return buffer
 
+def conversion(couleur):
+    nouvelle_couleur=[]
+    for i in couleur:
+        nouvelle_couleur.append(i/255)
+
+    return tuple(nouvelle_couleur)

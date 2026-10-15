@@ -15,8 +15,6 @@ class Entite :
     def dessiner(self,screen,assets):
         screen.blit(assets[self.espece],(self.x-rayon, self.y-rayon))
 
-
-
     def nouvelle_position(self):
 
         self.rebond()
@@ -26,14 +24,18 @@ class Entite :
     def rebond(self):
         if self.x-rayon<=Marge:
             self.vitesse_x = - self.vitesse_x
+            self.x = Marge + rayon
         if self.x + rayon >= Largeur - Marge:
             self.vitesse_x = - self.vitesse_x
+            self.x = (Largeur - Marge) - rayon
 
         if self.y+rayon>=Hauteur-Marge:
             self.vitesse_y = - self.vitesse_y
+            self.y = (Hauteur - Marge) - rayon
 
         if self.y - rayon <=Hauteur_stat + Marge:
             self.vitesse_y = - self.vitesse_y
+            self.y = (Hauteur_stat + Marge) + rayon
 
 
     def collision(self,autre):
