@@ -19,11 +19,6 @@ Hauteur= Hauteur_zone +  Hauteur_stat
 Largeur= 1080
 Marge = 10
 
-# Taille d'affichage à modifier avant de lancer la simulation.
-# La scène ci-dessus sert de référence pour garder les mêmes proportions.
-Largeur_fenetre = 1080
-Hauteur_fenetre = 1920
-
 FPS=24
 
 # Couleur
