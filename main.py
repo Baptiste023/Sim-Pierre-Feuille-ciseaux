@@ -1,38 +1,44 @@
+from time import sleep
+import datetime
+import os
+
 from interface import*
 from simulation import*
 
 import sys
-sys.path.append(r"C:\Users\bapti\Code en python\Enregisteur video")
+sys.path.append(r"") # Chemin de l'enregistreur
 from Enregistreur import Enregistreur
 
 
+
+os.environ["SDL_VIDEODRIVER"]="dummy"
 pygame.init()
-fenetre = pygame.display.set_mode((Largeur_fenetre, Hauteur_fenetre))
-# La scène et la vidéo gardent une résolution fixe ; seul l'affichage est agrandi.
-screen = pygame.Surface((Largeur,Hauteur)).convert()
+screen = pygame.display.set_mode((Largeur,Hauteur))
 pygame.display.set_caption('SIM Guerre PFC')
 assets= charger_assets()
 clock = pygame.time.Clock()
 police=pygame.font.SysFont("Arial", Taille_texte)
 police2=pygame.font.SysFont("Arial", taille_crown)
-zones = gerer_apparition()
+
+
 def init():
     Liste_entite = []
     Liste_position = []
     Histo_pierre = []
     Histo_ciseau = []
     Histo_feuille = []
-    enregistreur = Enregistreur(Hauteur=Hauteur, Largeur=Largeur, FPS=FPS, chemin="test_video.mp4", duree_min=10)
+    date = datetime.datetime.now().strftime("%d_%m_%H_%M_%S")
+    enregistreur = Enregistreur(Hauteur=Hauteur, Largeur=Largeur, FPS=FPS, chemin=f"PFC_{date}.mp4", duree_min=60)
     win = False
     creer_graph = False
     surface_graph = None
     ajout_enregistreur = False
-
+    zones = gerer_apparition()
     for espece in zones:
         x_zone, y_zone = zones[espece]
-        for _ in range(30):
+        for _ in range(40):
             x, y = position_dans_zones(x_zone, y_zone, Liste_position)
-            Liste_entite.append(Entite(espece, x, y, 15, random.uniform(0, 2 * math.pi)))
+            Liste_entite.append(Entite(espece, x, y, 12, random.uniform(0, 2 * math.pi)))
             Liste_position.append((x, y))
 
     return Liste_entite, enregistreur, creer_graph,surface_graph,ajout_enregistreur,Histo_pierre,Histo_ciseau,Histo_feuille, win
@@ -53,17 +59,19 @@ while running:
             running = False
 
     clock.tick(FPS)
+    pygame.display.flip()
 
 
 
     if win:
+       pygame.time.wait(1000)
        screen.fill(Blanc)
        afficher_victoire(screen,win,assets,police2)
        if not creer_graph:
            buffer_graph = creer_graphique(Histo_feuille, Histo_ciseau, Histo_pierre)
            surface = pygame.image.load(buffer_graph)
            creer_graph = True
-       screen.blit(surface,(15,75))
+       screen.blit(surface,((Largeur - surface.get_width())//2, 150))
 
        if not ajout_enregistreur:
            enregistreur.ajouter_image(screen)
@@ -72,6 +80,8 @@ while running:
            ajout_enregistreur = True
            if not assez_long :
                Liste_entite, enregistreur, creer_graph,surface_graph,ajout_enregistreur,Histo_pierre,Histo_ciseau,Histo_feuille,win =init()
+           else:
+               running = False
 
 
     else:
@@ -94,7 +104,6 @@ while running:
 
         enregistreur.ajouter_image(screen)
 
-    afficher_fenetre(fenetre, screen)
 
 
 if not  ajout_enregistreur:
